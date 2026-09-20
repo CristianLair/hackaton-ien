@@ -7,6 +7,7 @@ import {
   cheapestCarrier,
   fastestCarrier,
   formatARS,
+  pesoTotalEnvio,
   quote,
   type Carrier,
 } from "@/lib/shipping";
@@ -22,7 +23,7 @@ export default function CotizacionPage() {
     return (
       <EmptyState
         title="Todavía no cargaste tu envío"
-        description="Primero definí origen, destino y cantidad de paquetes para poder cotizar."
+        description="Primero definí origen, destino, cantidad de paquetes y peso para poder cotizar."
         ctaHref="/"
         ctaLabel="Cargar mi envío"
       />
@@ -30,10 +31,11 @@ export default function CotizacionPage() {
   }
 
   const cantidad = state.cantidad;
-  const best = cheapestCarrier(cantidad);
+  const pesoTotal = pesoTotalEnvio(state.pesoPorPaqueteKg, cantidad);
+  const best = cheapestCarrier(pesoTotal);
   const fastest = fastestCarrier();
 
-  const sorted = [...CARRIERS].sort((a, b) => quote(a, cantidad) - quote(b, cantidad));
+  const sorted = [...CARRIERS].sort((a, b) => quote(a, pesoTotal) - quote(b, pesoTotal));
 
   const handleElegir = (carrier: Carrier) => {
     setSelectedId(carrier.id);
@@ -50,7 +52,9 @@ export default function CotizacionPage() {
             {state.origen} <span className="text-teal-500">→</span> {state.destino}
           </h1>
           <p className="mt-1 text-slate-500">
-            {cantidad} {cantidad === 1 ? "paquete" : "paquetes"} · Cotización instantánea
+            {cantidad} {cantidad === 1 ? "paquete" : "paquetes"} ·{" "}
+            {pesoTotal.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg totales · Cotización
+            instantánea
           </p>
         </div>
         <button
@@ -73,7 +77,7 @@ export default function CotizacionPage() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
         {sorted.map((carrier) => {
-          const total = quote(carrier, cantidad);
+          const total = quote(carrier, pesoTotal);
           const isBest = carrier.id === best.id;
           const isFastest = carrier.id === fastest.id;
           const selected = carrier.id === selectedId;
@@ -123,7 +127,7 @@ export default function CotizacionPage() {
               <div className="mt-4 space-y-1.5 text-sm text-slate-500">
                 <p>Recolección en {carrier.pickupHours} hs en {state.origen}</p>
                 <p>
-                  Tarifa base {formatARS(carrier.baseRate)} + {formatARS(carrier.perPackage)} por paquete
+                  Tarifa base {formatARS(carrier.baseRate)} + {formatARS(carrier.perKg)} por kg
                 </p>
               </div>
 

@@ -9,7 +9,7 @@ export type Carrier = {
   rating: number;
   deliveries: number;
   baseRate: number;
-  perPackage: number;
+  perKg: number;
   days: number;
   pickupHours: number;
 };
@@ -22,7 +22,7 @@ export const CARRIERS: Carrier[] = [
     rating: 4.6,
     deliveries: 1240,
     baseRate: 5200,
-    perPackage: 1800,
+    perKg: 900,
     days: 1,
     pickupHours: 4,
   },
@@ -33,7 +33,7 @@ export const CARRIERS: Carrier[] = [
     rating: 4.4,
     deliveries: 980,
     baseRate: 4800,
-    perPackage: 1500,
+    perKg: 700,
     days: 1,
     pickupHours: 6,
   },
@@ -44,7 +44,7 @@ export const CARRIERS: Carrier[] = [
     rating: 4.7,
     deliveries: 1560,
     baseRate: 5900,
-    perPackage: 1600,
+    perKg: 850,
     days: 1,
     pickupHours: 3,
   },
@@ -55,7 +55,7 @@ export const CARRIERS: Carrier[] = [
     rating: 4.2,
     deliveries: 740,
     baseRate: 3900,
-    perPackage: 1300,
+    perKg: 600,
     days: 2,
     pickupHours: 8,
   },
@@ -67,18 +67,23 @@ export type ShippingState = {
   origen: City | null;
   destino: City | null;
   cantidad: number;
+  pesoPorPaqueteKg: number;
   carrierId: string | null;
   trackingNumber: string | null;
   status: ShippingStatus;
   createdAt: string | null;
 };
 
-export function quote(carrier: Carrier, cantidad: number): number {
-  return carrier.baseRate + carrier.perPackage * cantidad;
+export function pesoTotalEnvio(pesoPorPaqueteKg: number, cantidad: number): number {
+  return pesoPorPaqueteKg * cantidad;
 }
 
-export function cheapestCarrier(cantidad: number): Carrier {
-  return [...CARRIERS].sort((a, b) => quote(a, cantidad) - quote(b, cantidad))[0];
+export function quote(carrier: Carrier, pesoTotal: number): number {
+  return Math.round(carrier.baseRate + carrier.perKg * pesoTotal);
+}
+
+export function cheapestCarrier(pesoTotal: number): Carrier {
+  return [...CARRIERS].sort((a, b) => quote(a, pesoTotal) - quote(b, pesoTotal))[0];
 }
 
 export function fastestCarrier(): Carrier {

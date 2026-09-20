@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CARRIERS, formatARS, quote, shortToken } from "@/lib/shipping";
+import { CARRIERS, formatARS, pesoTotalEnvio, quote, shortToken } from "@/lib/shipping";
 import { useShipping } from "@/components/shipping-provider";
 import { EmptyState } from "@/components/empty-state";
 import { QrMock } from "@/components/qr-mock";
@@ -35,8 +35,11 @@ export default function PagoPage() {
     );
   }
 
-  const total = quote(carrier, state.cantidad);
-  const token = shortToken(`${state.origen}${state.destino}${carrier.id}${state.cantidad}`);
+  const pesoTotal = pesoTotalEnvio(state.pesoPorPaqueteKg, state.cantidad);
+  const total = quote(carrier, pesoTotal);
+  const token = shortToken(
+    `${state.origen}${state.destino}${carrier.id}${state.cantidad}${state.pesoPorPaqueteKg}`
+  );
   const link = `https://pago.paquetenea.ar/p/${token}`;
 
   const handleCopy = async () => {
@@ -61,8 +64,12 @@ export default function PagoPage() {
     { k: "Transportista", v: carrier.name },
     { k: "Paquetes", v: String(state.cantidad) },
     {
-      k: "Tarifa base + por paquete",
-      v: `${formatARS(carrier.baseRate)} + ${formatARS(carrier.perPackage)} × ${state.cantidad}`,
+      k: "Peso",
+      v: `${state.pesoPorPaqueteKg.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg por paquete · ${pesoTotal.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg totales`,
+    },
+    {
+      k: "Tarifa base + por kg",
+      v: `${formatARS(carrier.baseRate)} + ${formatARS(carrier.perKg)} × ${pesoTotal.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg`,
     },
   ];
 

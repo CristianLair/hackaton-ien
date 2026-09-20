@@ -8,11 +8,16 @@ import { useShipping } from "@/components/shipping-provider";
 const FIELD_BASE =
   "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100";
 
+function roundKg(n: number): number {
+  return Math.round(n * 10) / 10;
+}
+
 export default function CargaEnvioPage() {
   const router = useRouter();
-  const { state, setOrigen, setDestino, setCantidad } = useShipping();
+  const { state, setOrigen, setDestino, setCantidad, setPesoKg } = useShipping();
   const [error, setError] = useState<string | null>(null);
 
+  const pesoTotal = state.pesoPorPaqueteKg * state.cantidad;
   const destinoIgual = state.origen !== null && state.destino !== null && state.origen === state.destino;
 
   const handleCotizar = () => {
@@ -22,6 +27,10 @@ export default function CargaEnvioPage() {
     }
     if (destinoIgual) {
       setError("El destino debe ser distinto al origen.");
+      return;
+    }
+    if (state.pesoPorPaqueteKg <= 0) {
+      setError("Ingresá un peso válido por paquete.");
       return;
     }
     setError(null);
@@ -84,7 +93,7 @@ export default function CargaEnvioPage() {
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-xl font-semibold text-slate-900">Nuevo envío</h2>
-          <p className="mt-1 text-sm text-slate-500">Cargá origen, destino y cantidad.</p>
+          <p className="mt-1 text-sm text-slate-500">Cargá origen, destino, cantidad y peso.</p>
 
           <div className="mt-6 space-y-5">
             <div>
@@ -167,10 +176,44 @@ export default function CargaEnvioPage() {
                   +
                 </button>
               </div>
-              <p className="mt-1.5 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500">
                 {state.cantidad === 1
                   ? "Un envío individual, simple y sin volumen."
                   : `Enviás ${state.cantidad} paquetes: cotizamos en cantidad.`}
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="peso" className="mb-1.5 block text-sm font-medium text-slate-700">
+                Peso por paquete (kg)
+              </label>
+              <div className="flex items-center justify-between rounded-xl border border-slate-300 bg-white p-2 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setPesoKg(roundKg(state.pesoPorPaqueteKg - 0.5))}
+                  disabled={state.pesoPorPaqueteKg <= 0.5}
+                  aria-label="Bajar el peso medio kilo"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-lg font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  −
+                </button>
+                <span className="text-lg font-bold text-slate-900">
+                  {state.pesoPorPaqueteKg.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPesoKg(roundKg(state.pesoPorPaqueteKg + 0.5))}
+                  disabled={state.pesoPorPaqueteKg >= 1000}
+                  aria-label="Subir el peso medio kilo"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-lg font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  +
+                </button>
+              </div>
+              <p className="mt-1.5 text-sm text-slate-500">
+                {state.cantidad === 1
+                  ? `Peso total de tu envío: ${state.pesoPorPaqueteKg.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg.`
+                  : `Peso total estimado: ${pesoTotal.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg (${state.cantidad} × ${state.pesoPorPaqueteKg.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg).`}
               </p>
             </div>
 
@@ -197,7 +240,7 @@ export default function CargaEnvioPage() {
             {
               n: "01",
               t: "Cotizá",
-              d: "Ingresás origen, destino y cantidad; comparamos transportistas por precio y tiempo.",
+              d: "Ingresás origen, destino, cantidad y peso; comparamos transportistas por precio y tiempo.",
             },
             {
               n: "02",

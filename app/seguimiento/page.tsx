@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CARRIERS, formatARS, quote, type ShippingStatus } from "@/lib/shipping";
+import { CARRIERS, formatARS, pesoTotalEnvio, quote, type ShippingStatus } from "@/lib/shipping";
 import { useShipping } from "@/components/shipping-provider";
 import { EmptyState } from "@/components/empty-state";
 
@@ -67,7 +67,8 @@ export default function SeguimientoPage() {
     },
   ];
 
-  const total = quote(carrier, state.cantidad);
+  const pesoTotal = pesoTotalEnvio(state.pesoPorPaqueteKg, state.cantidad);
+  const total = quote(carrier, pesoTotal);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14">
@@ -166,6 +167,13 @@ export default function SeguimientoPage() {
               <div className="flex justify-between gap-4">
                 <dt className="text-slate-500">Paquetes</dt>
                 <dd className="font-medium text-slate-800">{state.cantidad}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-slate-500">Peso</dt>
+                <dd className="font-medium text-slate-800">
+                  {state.pesoPorPaqueteKg.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg por
+                  paquete · {pesoTotal.toLocaleString("es-AR", { maximumFractionDigits: 1 })} kg totales
+                </dd>
               </div>
               <div className="flex justify-between gap-4 border-t border-slate-100 pt-3">
                 <dt className="text-slate-500">Total pagado</dt>

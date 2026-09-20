@@ -8,13 +8,14 @@ import {
 } from "react";
 import { generateTrackingNumber, type City, type ShippingState } from "@/lib/shipping";
 
-const STORAGE_KEY = "paquetenea.shipping.v1";
+const STORAGE_KEY = "paquetenea.shipping.v2";
 const CHANGE_EVENT = "paquetenea:change";
 
 const defaultState: ShippingState = {
   origen: null,
   destino: null,
   cantidad: 1,
+  pesoPorPaqueteKg: 1,
   carrierId: null,
   trackingNumber: null,
   status: "en_camino",
@@ -61,6 +62,7 @@ type ShippingContextValue = {
   setOrigen: (city: City) => void;
   setDestino: (city: City) => void;
   setCantidad: (count: number) => void;
+  setPesoKg: (weight: number) => void;
   selectCarrier: (id: string) => void;
   confirmPayment: () => void;
   reset: () => void;
@@ -75,6 +77,8 @@ export function ShippingProvider({ children }: { children: ReactNode }) {
   const setDestino = (city: City) => write({ ...read(), destino: city });
   const setCantidad = (count: number) =>
     write({ ...read(), cantidad: Math.max(1, Math.min(99, count)) });
+  const setPesoKg = (weight: number) =>
+    write({ ...read(), pesoPorPaqueteKg: Math.max(0.5, Math.min(1000, weight)) });
   const selectCarrier = (id: string) => write({ ...read(), carrierId: id });
   const confirmPayment = () =>
     write({
@@ -86,7 +90,7 @@ export function ShippingProvider({ children }: { children: ReactNode }) {
 
   return (
     <ShippingContext.Provider
-      value={{ state, setOrigen, setDestino, setCantidad, selectCarrier, confirmPayment, reset }}
+      value={{ state, setOrigen, setDestino, setCantidad, setPesoKg, selectCarrier, confirmPayment, reset }}
     >
       {children}
     </ShippingContext.Provider>
