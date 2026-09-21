@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, "..", "public");
 
 const TEAL = [13, 148, 136];
+const VIOLET = [124, 58, 237];
 const WHITE = [255, 255, 255];
 
 const CRC_TABLE = new Uint32Array(256);
@@ -60,15 +61,15 @@ function encodePNG(size, rgba) {
   ]);
 }
 
-function drawPackage(size, maskable) {
+function drawPackage(size, maskable, main = TEAL) {
   const rgba = new Uint8Array(size * size * 4);
   const px = (x, y) => (y * size + x) * 4;
 
   for (let i = 0; i < size * size; i++) {
     const o = i * 4;
-    rgba[o] = TEAL[0];
-    rgba[o + 1] = TEAL[1];
-    rgba[o + 2] = TEAL[2];
+    rgba[o] = main[0];
+    rgba[o + 1] = main[1];
+    rgba[o + 2] = main[2];
     rgba[o + 3] = 255;
   }
 
@@ -100,22 +101,24 @@ function drawPackage(size, maskable) {
 
   fill(xBandL, yBand0, xBandR, yBand1, WHITE);
   fill(xBoxL, yBoxTop, xBoxR, yBoxBot, WHITE);
-  fill(xCreaseMin, yBand0, xCreaseMax, yBoxBot, TEAL);
+  fill(xCreaseMin, yBand0, xCreaseMax, yBoxBot, main);
 
   return Buffer.from(rgba);
 }
 
 const targets = [
-  ["icon-192.png", 192, false],
-  ["icon-512.png", 512, false],
-  ["icon-512-maskable.png", 512, true],
-  ["apple-touch-icon.png", 180, false],
-  ["badge.png", 96, false],
+  ["icon-192.png", 192, false, TEAL],
+  ["icon-512.png", 512, false, TEAL],
+  ["icon-512-maskable.png", 512, true, TEAL],
+  ["apple-touch-icon.png", 180, false, TEAL],
+  ["badge.png", 96, false, TEAL],
+  ["icon-192-violet.png", 192, false, VIOLET],
+  ["icon-512-violet.png", 512, false, VIOLET],
 ];
 
 mkdirSync(OUT, { recursive: true });
-for (const [name, size, maskable] of targets) {
-  const buf = encodePNG(size, drawPackage(size, maskable));
+for (const [name, size, maskable, color] of targets) {
+  const buf = encodePNG(size, drawPackage(size, maskable, color));
   writeFileSync(join(OUT, name), buf);
   console.log(`✓ ${name} (${size}x${size}, ${buf.length} bytes)`);
 }

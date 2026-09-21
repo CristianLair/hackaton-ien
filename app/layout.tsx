@@ -5,6 +5,7 @@ import { ShippingProvider } from "@/components/shipping-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { PwaRegister } from "@/components/pwa-register";
+import { Favicon } from "@/components/favicon";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,10 +32,6 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    icon: [
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
 };
@@ -60,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main className="flex flex-1 flex-col">{children}</main>
           <Footer />
           <PwaRegister />
+          <Favicon />
         </ShippingProvider>
       </body>
     </html>
