@@ -36,6 +36,7 @@ export function Header() {
   const pathname = usePathname();
   useShipping();
 
+  const esAsistente = pathname === "/asistente";
   const currentIndex = STEPS.findIndex((s) => s.href === pathname);
 
   return (
@@ -48,51 +49,77 @@ export function Header() {
           </span>
         </Link>
 
-        <nav aria-label="Progreso del envío" className="flex items-center gap-4 sm:gap-5">
-          {STEPS.map((s, i) => {
-            const active = i === currentIndex;
-            const done = currentIndex !== -1 && i < currentIndex;
-            return (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group flex items-center gap-2"
-                aria-current={active ? "step" : undefined}
-              >
-                <span
-                  className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${
-                    active
-                      ? "border-teal-600 bg-teal-600 text-white"
-                      : done
-                        ? "border-teal-200 bg-teal-50 text-teal-700"
-                        : "border-slate-300 bg-white text-slate-400 group-hover:border-slate-400"
-                  }`}
+        {esAsistente ? (
+          <nav aria-label="Secciones" className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="text-sm font-medium text-slate-500 transition hover:text-slate-900"
+            >
+              ← Envíos regionales
+            </Link>
+            <span className="inline-flex items-center rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700">
+              Asistente IA
+            </span>
+          </nav>
+        ) : (
+          <nav aria-label="Progreso del envío" className="flex items-center gap-4 sm:gap-5">
+            {STEPS.map((s, i) => {
+              const active = i === currentIndex;
+              const done = currentIndex !== -1 && i < currentIndex;
+              return (
+                <Link
+                  key={s.href}
+                  href={s.href}
+                  className="group flex items-center gap-2"
+                  aria-current={active ? "step" : undefined}
                 >
-                  {done ? (
-                    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-                      <path
-                        d="M3.5 8.5 6.5 11.5 12.5 5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : (
-                    s.n
-                  )}
-                </span>
-                <span
-                  className={`hidden text-sm font-medium lg:inline ${
-                    active ? "text-slate-900" : done ? "text-slate-600" : "text-slate-400"
-                  }`}
-                >
-                  {s.label}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+                  <span
+                    className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${
+                      active
+                        ? "border-teal-600 bg-teal-600 text-white"
+                        : done
+                          ? "border-teal-200 bg-teal-50 text-teal-700"
+                          : "border-slate-300 bg-white text-slate-400 group-hover:border-slate-400"
+                    }`}
+                  >
+                    {done ? (
+                      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+                        <path
+                          d="M3.5 8.5 6.5 11.5 12.5 5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : (
+                      s.n
+                    )}
+                  </span>
+                  <span
+                    className={`hidden text-sm font-medium lg:inline ${
+                      active ? "text-slate-900" : done ? "text-slate-600" : "text-slate-400"
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        )}
+
+        <Link
+          href="/asistente"
+          className={`hidden md:inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+            esAsistente
+              ? "bg-violet-600 text-white"
+              : "border border-violet-200 text-violet-700 hover:border-violet-400"
+          }`}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
+          Asistente IA
+        </Link>
       </div>
     </header>
   );

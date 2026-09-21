@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CITIES, CARRIERS } from "@/lib/shipping";
 import { useShipping } from "@/components/shipping-provider";
@@ -267,6 +268,35 @@ export default function CargaEnvioPage() {
           Somos la capa simple que hoy no existe para que un emprendedor chico mande un paquete
           sin cotizar en cinco lugares distintos.
         </p>
+      </section>
+
+      <section className="mt-14 overflow-hidden rounded-3xl bg-violet-600 p-6 text-white shadow-lg sm:p-8">
+        <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">
+              ¿Vendés por WhatsApp o Instagram?
+            </h2>
+            <p className="mt-1 max-w-xl text-violet-100">
+              El Asistente Operativo con IA convierte la info dispersa de tu negocio en pedidos,
+              pagos, tareas y entregas organizadas. Probá la demo.
+            </p>
+          </div>
+          <Link
+            href="/asistente"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-violet-700 shadow-sm transition-colors hover:bg-violet-50"
+          >
+            Probar el Asistente IA
+            <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
+              <path
+                d="M6 4 10 8l-4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
       </section>
     </div>
   );
