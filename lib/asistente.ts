@@ -30,12 +30,231 @@ export type ParseResult = {
   completo: boolean;
 };
 
+export type ValidacionPedido =
+  | { valido: true }
+  | { valido: false; motivo: "vacio" | "sin_producto" };
+
+export function validarPedido(texto: string, resultado: ParseResult): ValidacionPedido {
+  if (!texto.trim()) return { valido: false, motivo: "vacio" };
+  if (resultado.pedido.productos.length === 0) return { valido: false, motivo: "sin_producto" };
+  return { valido: true };
+}
+
+export type Rubro = {
+  id: string;
+  nombre: string;
+  emoji: string;
+  descripcion: string;
+  productos: string[];
+};
+
+export const RUBROS: Rubro[] = [
+  {
+    id: "perfumeria",
+    nombre: "Perfumería",
+    emoji: "🌸",
+    descripcion: "Perfumes, colonias y fragancias.",
+    productos: ["perfume", "perfumes", "colonia", "colonias", "fragancia", "fragancias"],
+  },
+  {
+    id: "indumentaria",
+    nombre: "Indumentaria",
+    emoji: "👕",
+    descripcion: "Remeras, buzos, jeans, vestidos y calzado.",
+    productos: [
+      "remera",
+      "remeras",
+      "buzo",
+      "buzos",
+      "pantalón",
+      "pantalon",
+      "pantalones",
+      "jean",
+      "jeans",
+      "vestido",
+      "vestidos",
+      "pollera",
+      "polleras",
+      "falda",
+      "faldas",
+      "campera",
+      "camperas",
+      "zapatillas",
+      "zapatos",
+      "zapato",
+      "gorra",
+      "gorras",
+      "gorro",
+      "gorros",
+      "bufanda",
+      "bufandas",
+      "pañuelo",
+      "pañuelos",
+    ],
+  },
+  {
+    id: "belleza",
+    nombre: "Belleza y cuidado",
+    emoji: "💄",
+    descripcion: "Cremas, jabones, esmaltes y cosmética.",
+    productos: ["jabón", "jabon", "jabones", "crema", "cremas", "esmalte", "esmaltes"],
+  },
+  {
+    id: "deco_hogar",
+    nombre: "Deco y hogar",
+    emoji: "🕯️",
+    descripcion: "Velas, tazas, mates, termos y cuadros.",
+    productos: [
+      "vela",
+      "velas",
+      "taza",
+      "tazas",
+      "mate",
+      "mates",
+      "termo",
+      "termos",
+      "cuadro",
+      "cuadros",
+    ],
+  },
+  {
+    id: "gastronomia",
+    nombre: "Gastronomía",
+    emoji: "🍰",
+    descripcion: "Alfajores, facturas, tortas y dulces.",
+    productos: [
+      "alfajor",
+      "alfajores",
+      "facturas",
+      "torta",
+      "tortas",
+      "galletas",
+      "galletitas",
+      "miel",
+      "mermelada",
+      "mermeladas",
+    ],
+  },
+  {
+    id: "accesorios",
+    nombre: "Accesorios y joyería",
+    emoji: "💍",
+    descripcion: "Carteras, bolsos, aros, collares, joyas y riñoneras.",
+    productos: [
+      "cartera",
+      "carteras",
+      "bolso",
+      "bolsos",
+      "aro",
+      "aros",
+      "collar",
+      "collares",
+      "joya",
+      "joyas",
+      "alhaja",
+      "alhajas",
+      "riñonera",
+      "riñoneras",
+    ],
+  },
+  {
+    id: "libreria",
+    nombre: "Librería",
+    emoji: "📚",
+    descripcion: "Libros y cuadernos.",
+    productos: ["libro", "libros", "cuaderno", "cuadernos"],
+  },
+  {
+    id: "bebidas",
+    nombre: "Bebidas",
+    emoji: "🍷",
+    descripcion: "Vinos y cervezas.",
+    productos: ["vino", "vinos", "cerveza", "cervezas"],
+  },
+];
+
+export function rubroPorId(id: string | null | undefined): Rubro | undefined {
+  return RUBROS.find((r) => r.id === id);
+}
+
+export function productoFueraDeRubro(texto: string, rubroId: string | null): string | null {
+  const rubro = rubroPorId(rubroId);
+  if (!rubro) return null;
+  const permitidos = new Set(rubro.productos);
+  for (const prod of PRODUCTOS) {
+    if (permitidos.has(prod)) continue;
+    const re = new RegExp(`\\b(${prod})\\b`, "gi");
+    if (re.test(texto)) return prod;
+  }
+  return null;
+}
+
+export function construyeTarea(cliente: string, estadoPago: EstadoPago, entrega: Entrega): string {
+  const tareas: string[] = ["Preparar pedido"];
+  if (estadoPago === "pendiente") {
+    tareas.push(`Recordar cobro a ${cliente}`);
+  }
+  if (entrega.modalidad === "retira") {
+    tareas.push("Coordinar retiro");
+  } else if (entrega.modalidad === "envio") {
+    tareas.push("Coordinar envío");
+  }
+  return tareas.join(" · ");
+}
+
+export function pedidoCompleto(
+  parsed: Pick<PedidoParsed, "cliente" | "productos" | "estadoPago" | "entrega">,
+): boolean {
+  const clienteOk = parsed.cliente.trim() !== "" && parsed.cliente !== "Cliente nuevo";
+  return Boolean(
+    clienteOk &&
+      parsed.productos.length > 0 &&
+      parsed.estadoPago !== "sin_dato" &&
+      parsed.entrega.modalidad !== "indefinida",
+  );
+}
+
+export function faltantesDePedido(
+  p: Pick<PedidoParsed, "cliente" | "productos" | "estadoPago" | "entrega">,
+): string[] {
+  const faltantes: string[] = [];
+  if (!p.cliente.trim() || p.cliente === "Cliente nuevo") faltantes.push("Cliente nuevo");
+  if (p.productos.length === 0) faltantes.push("Sin productos");
+  if (p.estadoPago === "sin_dato") faltantes.push("Pago a confirmar");
+  if (p.entrega.modalidad === "indefinida") faltantes.push("Entrega a coordinar");
+  return faltantes;
+}
+
+export function ejemploParaRubro(rubroId: string | null | undefined): string {
+  const rubro = rubroPorId(rubroId);
+  switch (rubro?.id) {
+    case "indumentaria":
+      return PEDIDO_EJEMPLO;
+    case "perfumeria":
+      return "Marta pidió 2 perfumes de 50ml, retiran el jueves y ya me transfirió.";
+    case "belleza":
+      return "Valen pidió 3 cremas hidratantes, retira hoy y pagó en efectivo.";
+    case "deco_hogar":
+      return "Juan pidió una vela de soja y 2 tazas, las retira el viernes y le cobro al retirar.";
+    case "gastronomia":
+      return "Ana pidió 6 alfajores y una torta, mandamos mañana y ya transfirió.";
+    case "accesorios":
+      return "Lau pidió 2 collares y una cartera, retira hoy y me debe el pago.";
+    case "libreria":
+      return "Pedro pidió 3 libros, los retira el lunes y ya pagó.";
+    case "bebidas":
+      return "Nacho pidió 2 vinos, se los envío mañana y pagó al momento.";
+    default:
+      return PEDIDO_EJEMPLO;
+  }
+}
+
 const NOMBRE_CON_VERBO_RE =
   /\b([A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+)\s+(pidi|pedi|encarg|compr|solicit|pide|necesit|reserv|separ|quiere|queri|va\s+a\s+llevar|llevar)\w*\b/i;
 
 const NOMBRE_PREP_RE = /(?:para|de|a|al)\s+([A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+)\s*\b/i;
 
-const PRODUCTOS: string[] = [
+export const PRODUCTOS: string[] = [
   "remera",
   "remeras",
   "buzo",
@@ -98,6 +317,10 @@ const PRODUCTOS: string[] = [
   "collares",
   "riñonera",
   "riñoneras",
+  "joya",
+  "joyas",
+  "alhaja",
+  "alhajas",
   "perfume",
   "perfumes",
   "libro",
@@ -164,25 +387,16 @@ const ENVIO_RE = /\b(enví|envi|mand|despach|courier|correo|reparto|a\s+domicili
 const ENTREGA_CUANDO_RE =
   /(hoy|mañana|esta\s+semana|el\s+(?:próximo|proximo)\s*(?:lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)|este\s+fin\s+de\s+semana|lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo|\d{1,2}\s*[/-]\s*\d{1,2})/i;
 
-export function parsearPedido(texto: string): ParseResult {
+export function parsearPedido(texto: string, rubroId?: string | null): ParseResult {
   const raw = texto.trim();
   const cliente = extraerCliente(raw);
-  const productos = extraerProductos(raw);
+  const productos = extraerProductos(raw, rubroId);
   const estadoPago = extraerPago(raw);
   const entrega = extraerEntrega(raw);
 
-  const tareas: string[] = ["Preparar pedido"];
-  if (estadoPago === "pendiente") {
-    tareas.push(`Recordar cobro a ${cliente}`);
-  }
-  if (entrega.modalidad === "retira") {
-    tareas.push("Coordinar retiro");
-  } else if (entrega.modalidad === "envio") {
-    tareas.push("Coordinar envío");
-  }
-  const tarea = tareas.join(" · ");
+  const tarea = construyeTarea(cliente, estadoPago, entrega);
 
-  const completo = Boolean(cliente && productos.length > 0 && estadoPago !== "sin_dato");
+  const completo = pedidoCompleto({ cliente, productos, estadoPago, entrega });
 
   return {
     pedido: {
@@ -206,13 +420,15 @@ function extraerCliente(texto: string): string {
   return "Cliente nuevo";
 }
 
-function extraerProductos(texto: string): Producto[] {
+function extraerProductos(texto: string, rubroId?: string | null): Producto[] {
   const talle = texto.match(TALLE_RE)?.[1];
   const colorMatch = extraerColor(texto);
 
   const encontrados = new Map<string, { cantidad: number; indice: number }>();
 
-  for (const prod of PRODUCTOS) {
+  const catalogo = rubroPorId(rubroId)?.productos ?? PRODUCTOS;
+
+  for (const prod of catalogo) {
     const re = new RegExp(`\\b(${prod})\\b`, "gi");
     let match: RegExpExecArray | null;
     while ((match = re.exec(texto))) {

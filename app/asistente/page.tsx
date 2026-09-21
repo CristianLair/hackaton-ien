@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AsistenteDemo } from "@/components/asistente/asistente-demo";
+import { AsistenteShell } from "@/components/asistente/asistente-shell";
 import { Pitch } from "@/components/asistente/pitch";
 
 export const metadata: Metadata = {
@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 export default function AsistentePage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14">
-      <AsistenteDemo />
-      <Pitch />
+      <AsistenteShell>
+        <Pitch />
+      </AsistenteShell>
     </div>
   );
 }

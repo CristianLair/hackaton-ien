@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useShipping } from "@/components/shipping-provider";
+import { useAuth } from "@/components/auth-provider";
 
 export function Logo({ className = "", variant = "teal" }: { className?: string; variant?: "teal" | "violet" }) {
   const main = variant === "violet" ? "fill-violet-600" : "fill-teal-600";
@@ -36,6 +37,7 @@ const STEPS = [
 
 export function Header() {
   const pathname = usePathname();
+  const { usuario, logout } = useAuth();
   useShipping();
 
   const esAsistente = pathname === "/asistente";
@@ -112,17 +114,37 @@ export function Header() {
           </nav>
         )}
 
-        <Link
-          href="/asistente"
-          className={`hidden md:inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
-            esAsistente
-              ? "bg-violet-600 text-white"
-              : "border border-violet-200 text-violet-700 hover:border-violet-400"
-          }`}
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
-          Asistente IA
-        </Link>
+        {esAsistente && usuario ? (
+          <div className="flex shrink-0 items-center gap-2.5">
+            <span className="hidden items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-1.5 shadow-sm sm:flex">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
+                {usuario.nombre.trim().charAt(0).toUpperCase()}
+              </span>
+              <span className="max-w-36 truncate text-xs font-medium text-slate-700">
+                {usuario.nombre}
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={logout}
+              className="shrink-0 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-red-300 hover:text-red-600"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/asistente"
+            className={`hidden md:inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+              esAsistente
+                ? "bg-violet-600 text-white"
+                : "border border-violet-200 text-violet-700 hover:border-violet-400"
+            }`}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
+            Asistente IA
+          </Link>
+        )}
       </div>
     </header>
   );

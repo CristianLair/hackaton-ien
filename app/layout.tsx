@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ShippingProvider } from "@/components/shipping-provider";
+import { AuthProvider } from "@/components/auth-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { PwaRegister } from "@/components/pwa-register";
@@ -52,13 +53,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-full flex flex-col">
-        <ShippingProvider>
-          <Header />
-          <main className="flex flex-1 flex-col">{children}</main>
-          <Footer />
-          <PwaRegister />
-          <Favicon />
-        </ShippingProvider>
+        <AuthProvider>
+          <ShippingProvider>
+            <Header />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <Footer />
+            <PwaRegister />
+            <Favicon />
+          </ShippingProvider>
+        </AuthProvider>
       </body>
     </html>
   );

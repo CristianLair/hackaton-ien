@@ -7,15 +7,17 @@ import {
   type ReactNode,
 } from "react";
 import type { Pedido, PedidoParsed } from "@/lib/asistente";
+import { construyeTarea, pedidoCompleto, rubroPorId } from "@/lib/asistente";
 
 const STORAGE_KEY = "paquetenea.asistente.v1";
 const CHANGE_EVENT = "paquetenea:asistente:change";
 
 type AsistenteState = {
   pedidos: Pedido[];
+  rubroId: string | null;
 };
 
-const defaultState: AsistenteState = { pedidos: [] };
+const defaultState: AsistenteState = { pedidos: [], rubroId: null };
 
 let cached: AsistenteState | null = null;
 
@@ -28,6 +30,9 @@ function read(): AsistenteState {
       : { ...defaultState };
   } catch {
     cached = { ...defaultState };
+  }
+  if (cached.rubroId && !rubroPorId(cached.rubroId)) {
+    cached = { ...cached, rubroId: null };
   }
   return cached;
 }
@@ -56,8 +61,11 @@ function subscribe(callback: () => void) {
 
 type AsistenteContextValue = {
   pedidos: Pedido[];
+  rubroId: string | null;
   addPedido: (data: PedidoParsed) => Pedido;
+  updatePedido: (id: number, data: PedidoParsed) => void;
   removePedido: (id: number) => void;
+  setRubro: (id: string | null) => void;
   reset: () => void;
 };
 
@@ -70,19 +78,54 @@ export function AsistenteProvider({ children }: { children: ReactNode }) {
     const pedidos = read().pedidos;
     const id = pedidos.reduce((max, p) => Math.max(max, p.id), 0) + 1;
     const pedido: Pedido = { ...data, id, createdAt: new Date().toISOString() };
-    write({ pedidos: [...pedidos, pedido] });
+    write({ ...read(), pedidos: [...pedidos, pedido] });
     return pedido;
   };
 
+  const updatePedido = (id: number, data: PedidoParsed) => {
+    const current = read();
+    const pedidos = current.pedidos.map((p) =>
+      p.id === id
+        ? {
+            ...p,
+            ...data,
+            tarea: construyeTarea(data.cliente, data.estadoPago, data.entrega),
+            notas: pedidoCompleto(data)
+              ? undefined
+              : "Algunos datos no quedaron claros, cargalos a mano.",
+          }
+        : p,
+    );
+    write({ ...current, pedidos });
+  };
+
   const removePedido = (id: number) => {
-    const pedidos = read().pedidos;
-    write({ pedidos: pedidos.filter((p) => p.id !== id) });
+    const current = read();
+    write({ ...current, pedidos: current.pedidos.filter((p) => p.id !== id) });
+  };
+
+  const setRubro = (id: string | null) => {
+    if (!id || !rubroPorId(id)) {
+      write({ ...read(), rubroId: null });
+      return;
+    }
+    write({ ...read(), rubroId: id });
   };
 
   const reset = () => write({ ...defaultState });
 
   return (
-    <AsistenteContext.Provider value={{ pedidos: state.pedidos, addPedido, removePedido, reset }}>
+    <AsistenteContext.Provider
+      value={{
+        pedidos: state.pedidos,
+        rubroId: state.rubroId,
+        addPedido,
+        updatePedido,
+        removePedido,
+        setRubro,
+        reset,
+      }}
+    >
       {children}
     </AsistenteContext.Provider>
   );
