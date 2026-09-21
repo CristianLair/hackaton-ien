@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useShipping } from "@/components/shipping-provider";
 
-export function Logo({ className = "" }: { className?: string }) {
+export function Logo({ className = "", variant = "teal" }: { className?: string; variant?: "teal" | "violet" }) {
+  const main = variant === "violet" ? "fill-violet-600" : "fill-teal-600";
+  const dot = variant === "violet" ? "fill-violet-200" : "fill-teal-200";
   return (
     <svg
       viewBox="0 0 32 32"
@@ -12,7 +14,7 @@ export function Logo({ className = "" }: { className?: string }) {
       aria-hidden="true"
       className={`h-8 w-8 ${className}`}
     >
-      <rect x="1.5" y="1.5" width="29" height="29" rx="8" className="fill-teal-600" />
+      <rect x="1.5" y="1.5" width="29" height="29" rx="8" className={main} />
       <path
         d="M9 17.5h9.5a4 4 0 0 0 0-8H11m-2 8 3.5 3.5M9 17.5l3.5-3.5"
         stroke="white"
@@ -20,7 +22,7 @@ export function Logo({ className = "" }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="22.5" cy="22.5" r="2.6" className="fill-teal-200" />
+      <circle cx="22.5" cy="22.5" r="2.6" className={dot} />
     </svg>
   );
 }
@@ -43,9 +45,10 @@ export function Header() {
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
         <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <Logo />
+          <Logo variant={esAsistente ? "violet" : "teal"} />
           <span className="text-lg font-bold tracking-tight text-slate-900">
-            Paquete<span className="text-teal-600">NEA</span>
+            Paquete
+            <span className={esAsistente ? "text-violet-600" : "text-teal-600"}>NEA</span>
           </span>
         </Link>
 
