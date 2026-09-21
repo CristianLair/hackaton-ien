@@ -19,14 +19,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PaqueteNEA · Enviá sin llamar a nadie",
+  title: "Nova GO · Enviá sin llamar a nadie",
   description:
     "Cotizá, pagá y seguí tus envíos entre Resistencia, Corrientes y Fontana en minutos, con transportistas regionales integrados.",
-  applicationName: "PaqueteNEA",
+  applicationName: "Nova GO",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "PaqueteNEA",
+    title: "Nova GO",
     statusBarStyle: "default",
   },
   formatDetection: {

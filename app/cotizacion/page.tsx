@@ -166,7 +166,7 @@ export default function CotizacionPage() {
       </div>
 
       <p className="mt-6 text-center text-sm text-slate-500">
-        Precio final sin sorpresas: lo que ves es lo que pagás, con recolección coordinada por PaqueteNEA.
+        Precio final sin sorpresas: lo que ves es lo que pagás, con recolección coordinada por Nova GO.
       </p>
     </div>
   );

@@ -12,7 +12,7 @@ export type Usuario = {
 
 const USUARIO_MOCK: Usuario = {
   nombre: "María · Emprendedora demo",
-  email: "demo@paquetenea.com",
+  email: "demo@novago.com",
 };
 
 type AuthState = {

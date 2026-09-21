@@ -49,8 +49,8 @@ export function Header() {
         <Link href="/" className="flex shrink-0 items-center gap-2.5">
           <Logo variant={esAsistente ? "violet" : "teal"} />
           <span className="text-lg font-bold tracking-tight text-slate-900">
-            Paquete
-            <span className={esAsistente ? "text-violet-600" : "text-teal-600"}>NEA</span>
+            Nova
+            <span className={esAsistente ? "text-violet-600" : "text-teal-600"}>GO</span>
           </span>
         </Link>
 

@@ -27,7 +27,7 @@ export function LoginScreen() {
             <input
               type="email"
               readOnly
-              value="demo@paquetenea.com"
+              value="demo@novago.com"
               className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-500 shadow-sm outline-none"
             />
           </label>

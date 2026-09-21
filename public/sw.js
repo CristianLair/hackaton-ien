@@ -1,6 +1,6 @@
-const VERSION = "paquetenea-v1";
-const APP_SHELL_CACHE = `paquetenea-shell-${VERSION}`;
-const RUNTIME_CACHE = `paquetenea-runtime-${VERSION}`;
+const VERSION = "novago-v1";
+const APP_SHELL_CACHE = `novago-shell-${VERSION}`;
+const RUNTIME_CACHE = `novago-runtime-${VERSION}`;
 
 const CORE_ASSETS = [
   "/",
@@ -75,7 +75,7 @@ self.addEventListener("push", (event) => {
   if (!event.data) return;
   const data = event.data.json();
   event.waitUntil(
-    self.registration.showNotification(data.title || "PaqueteNEA", {
+    self.registration.showNotification(data.title || "Nova GO", {
       body: data.body || "",
       icon: "/icon-192.png",
       badge: "/badge.png",

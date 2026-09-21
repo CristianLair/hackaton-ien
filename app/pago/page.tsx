@@ -40,7 +40,7 @@ export default function PagoPage() {
   const token = shortToken(
     `${state.origen}${state.destino}${carrier.id}${state.cantidad}${state.pesoPorPaqueteKg}`
   );
-  const link = `https://pago.paquetenea.ar/p/${token}`;
+  const link = `https://pago.novago.ar/p/${token}`;
 
   const handleCopy = async () => {
     try {
@@ -120,7 +120,7 @@ export default function PagoPage() {
                   Link de pago
                 </p>
                 <p className="mt-1 break-all font-mono text-sm font-semibold text-slate-900">
-                  pago.paquetenea.ar/p/{token}
+                  pago.novago.ar/p/{token}
                 </p>
                 <button
                   type="button"

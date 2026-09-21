@@ -2,11 +2,11 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "PaqueteNEA · Enviá sin llamar a nadie",
-    short_name: "PaqueteNEA",
+    name: "Nova GO · Enviá sin llamar a nadie",
+    short_name: "Nova GO",
     description:
       "Cotizá, pagá y seguí tus envíos en el NEA, y organizá tus pedidos de WhatsApp con el Asistente de IA.",
-    id: "paquetenea",
+    id: "novago",
     start_url: "/",
     scope: "/",
     display: "standalone",
