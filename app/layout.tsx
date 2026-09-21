@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ShippingProvider } from "@/components/shipping-provider";
 import { AuthProvider } from "@/components/auth-provider";
+import { AsistenteProvider } from "@/components/asistente-provider";
+import { DemoProvider } from "@/components/demo/demo-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { PwaRegister } from "@/components/pwa-register";
@@ -55,11 +57,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           <ShippingProvider>
-            <Header />
-            <main className="flex flex-1 flex-col">{children}</main>
-            <Footer />
-            <PwaRegister />
-            <Favicon />
+            <AsistenteProvider>
+              <DemoProvider>
+                <Header />
+                <main className="flex flex-1 flex-col">{children}</main>
+                <Footer />
+                <PwaRegister />
+                <Favicon />
+              </DemoProvider>
+            </AsistenteProvider>
           </ShippingProvider>
         </AuthProvider>
       </body>

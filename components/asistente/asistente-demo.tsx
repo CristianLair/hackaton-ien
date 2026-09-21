@@ -1,6 +1,5 @@
 "use client";
 
-import { AsistenteProvider } from "@/components/asistente-provider";
 import { ChatBox } from "@/components/asistente/chat-box";
 import { Dashboard } from "@/components/asistente/dashboard";
 import { RubroOnboarding } from "@/components/asistente/rubro-onboarding";
@@ -68,9 +67,5 @@ function DemoContent() {
 }
 
 export function AsistenteDemo() {
-  return (
-    <AsistenteProvider>
-      <DemoContent />
-    </AsistenteProvider>
-  );
+  return <DemoContent />;
 }
